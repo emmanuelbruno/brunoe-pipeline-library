@@ -5,16 +5,17 @@ def tokens = "${env.JOB_NAME}".tokenize('/')
 def org = tokens[tokens.size() - 3]
 def repo = tokens[tokens.size() - 2]
 def branch = tokens[tokens.size() - 1]
+
 def pom
 def gitRemote
 
-def init() {
+def JenkinsLSIS_init() {
     checkout scm
     pom = readMavenPom file: 'pom.xml'
     gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 }
 
-def build(pom, build_docker_image, UTLN_USERNAME, UTLN_PASSWORD) {
+def JenkinsLSIS_build(pom, build_docker_image, UTLN_USERNAME, UTLN_PASSWORD) {
     stage('Build') {
         docker.image(build_docker_image)
                 .inside(
@@ -42,7 +43,7 @@ def build(pom, build_docker_image, UTLN_USERNAME, UTLN_PASSWORD) {
     }
 }
 
-def deploy() {
+def JenkinsLSIS_deploy() {
     stage('Deploy') {
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'bruno.utln',
@@ -76,7 +77,7 @@ def deploy() {
     }
 }
 
-def tag() {
+def JenkinsLSIS_tag() {
     stage('Tag to Github') {
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'JenkinslsisGithub',
