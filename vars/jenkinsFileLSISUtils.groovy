@@ -4,6 +4,8 @@ def org = tokens[tokens.size() - 3]
 def repo = tokens[tokens.size() - 2]
 def branch = tokens[tokens.size() - 1]
 
+String slack_channel
+
 def setSlack_channel(slack_channel) {
     this.slack_channel = slack_channel
 }
