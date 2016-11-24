@@ -8,6 +8,10 @@ def setSlack_channel(slack_channel) {
     this.slack_channel = slack_channel
 }
 
+def getSlack_channel() {
+    return this.slack_channel
+}
+
 def setBuild_docker_image(build_docker_image) {
     this.build_docker_image = build_docker_image
 }
