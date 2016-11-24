@@ -1,12 +1,10 @@
 #!/usr/bin/groovy
-package fr.univtln.bruno
-
 def tokens = "${env.JOB_NAME}".tokenize('/')
 def org = tokens[tokens.size() - 3]
 def repo = tokens[tokens.size() - 2]
 def branch = tokens[tokens.size() - 1]
 
-def setSlack_channel(Slack_channel) {
+def setSlack_channel(slack_channel) {
     this.slack_channel = slack_channel
 }
 
@@ -62,7 +60,7 @@ def build(build_docker_image, UTLN_USERNAME, UTLN_PASSWORD) {
                     "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
                     "package"
         }
-        slackSend channel: slack_channel,
+        this.slackSend channel: slack_channel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
     }
