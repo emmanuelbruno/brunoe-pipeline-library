@@ -44,9 +44,9 @@ def init() {
     this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 }
 
-def build(build_docker_image, UTLN_USERNAME, UTLN_PASSWORD) {
+def build(UTLN_USERNAME, UTLN_PASSWORD) {
     stage('Build') {
-        docker.image(build_docker_image)
+        docker.image(this.build_docker_image)
                 .inside(
                 "-e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                         "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
