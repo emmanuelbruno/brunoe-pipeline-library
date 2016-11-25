@@ -1,4 +1,4 @@
-#!/usr/bin/groovy
+#!groovy
 def tokens = "${env.JOB_NAME}".tokenize('/')
 def org = tokens[tokens.size() - 3]
 def repo = tokens[tokens.size() - 2]
@@ -62,8 +62,8 @@ def mvn(params) {
                 "-Ddocker.host=tcp://172.18.0.1:2375 " +
                 "-Ddocker.username=${UTLN_USERNAME} " +
                 "-Ddocker.password=${UTLN_PASSWORD} " +
-                "-Ddocker.pull.registry=${pull_registry} " +
-                "-Ddocker.push.registry=${private_registry} " +
+                "-Ddocker.pull.registry=${pullRegistry} " +
+                "-Ddocker.push.registry=${privateRegistry} " +
                 "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                 "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                 "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
