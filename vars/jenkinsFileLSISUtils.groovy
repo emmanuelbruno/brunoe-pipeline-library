@@ -39,6 +39,8 @@ def setGitRemote(gitRemote) {
 }
 
 def init() {
+    sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=" +
+            "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}"
     slackSend channel: this.slackChannel,
             color: "good",
             message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
@@ -73,7 +75,10 @@ def mvn(params) {
 
 def mvnPackage() {
     stage('Package') {
-        mvn("package")
+        mvn("clean " +
+                "org.jacoco:jacoco-maven-plugin:prepare-agent " +
+                "verify"
+        )
         slackSend channel: slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
@@ -96,6 +101,8 @@ def gitTag() {
                           usernameVariable: 'GIT_USERNAME',
                           passwordVariable: 'GIT_PASSWORD']]) {
             sh """
+       git add .
+       git commit -m 'Tag Jenkins Build'
        git tag jenkins-${pom.artifactId}-${pom.version}-${env.BUILD_NUMBER}
        git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${gitRemote}  --tags
        """
