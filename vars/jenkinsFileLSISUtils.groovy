@@ -38,16 +38,6 @@ def setGitRemote(gitRemote) {
     this.getRemore = gitRemote
 }
 
-def init() {
-    checkout scm
-    this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
-    this.pom = readMavenPom file: 'pom.xml'
-    sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=" +
-            "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}"
-    slackSend channel: this.slackChannel,
-            color: "good",
-            message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
-}
 
 def mvn(params) {
     docker.image(this.mavenDockerImage)
@@ -72,6 +62,18 @@ def mvn(params) {
                 params
     }
 }
+
+def init() {
+    checkout scm
+    this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
+    this.pom = readMavenPom file: 'pom.xml'
+    mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
+            "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
+    slackSend channel: this.slackChannel,
+            color: "good",
+            message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
+}
+
 
 def mvnPackage() {
     stage('Package') {
