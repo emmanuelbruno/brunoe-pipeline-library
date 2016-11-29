@@ -39,14 +39,14 @@ def setGitRemote(gitRemote) {
 }
 
 def init() {
+    checkout scm
+    this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
+    this.pom = readMavenPom file: 'pom.xml'
     sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=" +
             "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}"
     slackSend channel: this.slackChannel,
             color: "good",
             message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
-    checkout scm
-    this.pom = readMavenPom file: 'pom.xml'
-    this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 }
 
 def mvn(params) {
