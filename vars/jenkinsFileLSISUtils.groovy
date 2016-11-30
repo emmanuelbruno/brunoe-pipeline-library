@@ -18,18 +18,6 @@ def setMavenDockerImage(mavenDockerImage) {
     this.mavenDockerImage = mavenDockerImage
 }
 
-def setDockerPullRegistry(dockerPullRegistry) {
-    this.dockerPullRegistry = dockerPullRegistry
-}
-
-def setDockerPrivateRegistry(dockerPrivateRegistry) {
-    this.DockerPrivateRegistry = dockerPrivateRegistry
-}
-
-def setDockerPublicRegistry(dockerPublicRegistry) {
-    this.dockerPublicRegistry = dockerPublicRegistry
-}
-
 def setPom(pom) {
     this.pom = pom
 }
@@ -37,7 +25,6 @@ def setPom(pom) {
 def setGitRemote(gitRemote) {
     this.getRemore = gitRemote
 }
-
 
 def mvn(params) {
     docker.image(this.mavenDockerImage)
@@ -57,10 +44,6 @@ def mvn(params) {
                     "-Duser.home=/home/user " +
                     "-B " +
                     "-Ddocker.host=tcp://172.18.0.1:2375 " +
-                    "-Ddocker.username=${UTLN_USERNAME} " +
-                    "-Ddocker.password=${UTLN_PASSWORD} " +
-                    "-Ddocker.pull.registry=${dockerPullRegistry} " +
-                    "-Ddocker.push.registry=${dockerPrivateRegistry} " +
                     "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
