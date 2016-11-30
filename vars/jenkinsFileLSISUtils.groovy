@@ -46,20 +46,27 @@ def mvn(params) {
                     "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     '-e DOCKER_HOST=tcp://172.18.0.1:2375 ' +
                     '-v /var/run/docker.sock:/var/run/docker.sock ' +
-                    '-v /home/jenkins/.m2:/home/user/.m2 ' +
+                    '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
                     '-v /home/jenkins/.docker:/home/user/.docker ') {
-        sh "mvn --settings /home/user/.m2/settings.xml " +
-                "-Duser.home=/home/user " +
-                "-B " +
-                "-Ddocker.host=tcp://172.18.0.1:2375 " +
-                "-Ddocker.username=${UTLN_USERNAME} " +
-                "-Ddocker.password=${UTLN_PASSWORD} " +
-                "-Ddocker.pull.registry=${dockerPullRegistry} " +
-                "-Ddocker.push.registry=${dockerPrivateRegistry} " +
-                "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
-                params
+        def mavenSettingsSecurityFile = "/home/user/.m2/settings-security.xml"
+        def mavenSettingsFile = "/home/user/.m2/settings.xml"
+
+        wrap([$class      : 'ConfigFileBuildWrapper',
+              managedFiles: [[fileId: 'settings-security.xml', targetLocation: "${mavenSettingsSecurityFile}"],
+                             [fileId: 'settings.xml', targetLocation: "${mavenSettingsFile}"]]]) {
+            sh "mvn --settings /home/user/.m2/settings.xml " +
+                    "-Duser.home=/home/user " +
+                    "-B " +
+                    "-Ddocker.host=tcp://172.18.0.1:2375 " +
+                    "-Ddocker.username=${UTLN_USERNAME} " +
+                    "-Ddocker.password=${UTLN_PASSWORD} " +
+                    "-Ddocker.pull.registry=${dockerPullRegistry} " +
+                    "-Ddocker.push.registry=${dockerPrivateRegistry} " +
+                    "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                    "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                    "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
+                    params
+        }
     }
 }
 
@@ -75,15 +82,32 @@ def init() {
 }
 
 
-def mvnPackage() {
-    stage('Package') {
-        mvn("clean " +
-                "org.jacoco:jacoco-maven-plugin:prepare-agent " +
+def mvnBuild() {
+    stage('Build') {
+        mvn("-Dmaven.test.skip=true clean package")
+        slackSend channel: slackChannel,
+                color: "good",
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
+    }
+}
+
+def mvnTest() {
+    stage('Test') {
+        mvn("org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
         slackSend channel: slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
+    }
+}
+
+def mvnQuality() {
+    stage('Quality') {
+        mvn("sonar:sonar")
+        slackSend channel: slackChannel,
+                color: "good",
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
     }
 }
 
