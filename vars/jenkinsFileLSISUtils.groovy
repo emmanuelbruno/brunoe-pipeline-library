@@ -51,9 +51,11 @@ def mvn(params) {
         def mavenSettingsSecurityFile = "/home/user/.m2/settings-security.xml"
         def mavenSettingsFile = "/home/user/.m2/settings.xml"
 
-        wrap([$class      : 'ConfigFileBuildWrapper',
-              managedFiles: [[fileId: 'settings-security.xml', targetLocation: "${mavenSettingsSecurityFile}"],
-                             [fileId: 'settings.xml', targetLocation: "${mavenSettingsFile}"]]]) {
+        configFileProvider(
+                [configFile(fileId: 'settings.xml', variable: 'MAVEN_SETTINGS',
+                        targetLocation: "${mavenSettingsSecurityFile}"),
+                 configFile(fileId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY',
+                         targetLocation: "${mavenSettingsFile}")]) {
             sh "mvn --settings /home/user/.m2/settings.xml " +
                     "-Duser.home=/home/user " +
                     "-B " +
@@ -72,7 +74,7 @@ def mvn(params) {
 
 def mvnDeploy(params) {
     stage('Deploy') {
-        mvn(params+" deploy")
+        mvn(params + " deploy")
         slackSend channel: this.slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] pushed."
@@ -83,7 +85,7 @@ def init() {
     checkout scm
     this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
     this.pom = readMavenPom file: 'pom.xml'
-    mvn("-P nexus-dev versions:set -DgenerateBackupPoms=false -DnewVersion=" +
+    mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
             "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
     slackSend channel: this.slackChannel,
             color: "good",
@@ -119,7 +121,6 @@ def mvnQuality() {
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
     }
 }
-
 
 
 def gitTag() {
