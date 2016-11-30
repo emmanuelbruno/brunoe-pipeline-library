@@ -75,6 +75,7 @@ def init() {
     this.pom = readMavenPom file: 'pom.xml'
     mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
             "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
+    this.pom = readMavenPom file: 'pom.xml'
     slackSend channel: this.slackChannel,
             color: "good",
             message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
