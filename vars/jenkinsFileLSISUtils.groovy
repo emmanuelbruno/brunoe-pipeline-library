@@ -70,6 +70,15 @@ def mvn(params) {
     }
 }
 
+def mvnDeploy(params) {
+    stage('Deploy') {
+        mvn(params+" deploy")
+        slackSend channel: this.slackChannel,
+                color: "good",
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] pushed."
+    }
+}
+
 def init() {
     checkout scm
     this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
@@ -84,7 +93,7 @@ def init() {
 
 def mvnBuild() {
     stage('Build') {
-        mvn("-Dmaven.test.skip=true clean package")
+        mvn("-P nexus-dev -Dmaven.test.skip=true clean package")
         slackSend channel: slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
@@ -93,7 +102,7 @@ def mvnBuild() {
 
 def mvnTest() {
     stage('Test') {
-        mvn("org.jacoco:jacoco-maven-plugin:prepare-agent " +
+        mvn("-P nexus-dev org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
         slackSend channel: slackChannel,
@@ -104,21 +113,14 @@ def mvnTest() {
 
 def mvnQuality() {
     stage('Quality') {
-        mvn("sonar:sonar")
+        mvn("-P nexus-dev sonar:sonar")
         slackSend channel: slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
     }
 }
 
-def mvnDeploy() {
-    stage('Deploy') {
-        mvn("deploy")
-        slackSend channel: this.slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] pushed."
-    }
-}
+
 
 def gitTag() {
     stage('Tag to Github') {
