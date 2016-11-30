@@ -79,6 +79,14 @@ def mvnDeploy(params) {
 }
 
 def init() {
+    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                      credentialsId   : 'login.utln',
+                      usernameVariable: 'UTLN_USERNAME',
+                      passwordVariable: 'UTLN_PASSWORD']]) {
+        this.UTLN_USERNAME = env.UTLN_USERNAME
+        this.UTLN_PASSWORD = env.UTLN_PASSWORD
+    }
+
     checkout scm
     this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
     this.pom = readMavenPom file: 'pom.xml'
@@ -92,7 +100,7 @@ def init() {
 
 def mvnBuild() {
     stage('Build') {
-        mvn("-P nexus-dev -Dmaven.test.skip=true clean package")
+        mvn("-P stage-devel -Dmaven.test.skip=true clean package")
         slackSend channel: slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
@@ -101,7 +109,7 @@ def mvnBuild() {
 
 def mvnTest() {
     stage('Test') {
-        mvn("-P nexus-dev org.jacoco:jacoco-maven-plugin:prepare-agent " +
+        mvn("-P stage-devel org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
         slackSend channel: slackChannel,
@@ -112,7 +120,7 @@ def mvnTest() {
 
 def mvnQuality() {
     stage('Quality') {
-        mvn("-P nexus-dev sonar:sonar")
+        mvn("-P stage-devel sonar:sonar")
         slackSend channel: slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
