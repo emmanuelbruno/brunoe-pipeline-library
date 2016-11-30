@@ -39,7 +39,7 @@ def mvn(params) {
         withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
                          [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
         ]) {
-            sh "cp ${MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
+            sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
             sh "mvn --settings ${MAVEN_SETTINGS} " +
                     "-Duser.home=/home/user " +
                     "-B " +
