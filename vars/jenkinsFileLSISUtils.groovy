@@ -52,11 +52,11 @@ def mvn(params) {
         def mavenSettingsFile = "/home/user/.m2/settings.xml"
 
         configFileProvider(
-                [configFile(fileId: 'settings.xml', variable: 'MAVEN_SETTINGS',
+                [configFile(fileId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY',
                         targetLocation: "${mavenSettingsSecurityFile}"),
-                 configFile(fileId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY',
+                 configFile(fileId: 'settings.xml', variable: 'MAVEN_SETTINGS',
                          targetLocation: "${mavenSettingsFile}")]) {
-            sh "mvn --settings /home/user/.m2/settings.xml " +
+            sh "mvn --settings ${MAVEN_SETTINGS} " +
                     "-Duser.home=/home/user " +
                     "-B " +
                     "-Ddocker.host=tcp://172.18.0.1:2375 " +
