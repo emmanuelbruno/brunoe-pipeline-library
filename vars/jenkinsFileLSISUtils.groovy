@@ -78,7 +78,7 @@ def init() {
     this.pom = readMavenPom file: 'pom.xml'
     slackSend channel: this.slackChannel,
             color: "good",
-            message: "Build starting. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>)"
+            message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
 }
 
 
