@@ -83,7 +83,7 @@ def init() {
     checkout scm
     this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
     this.pom = readMavenPom file: 'pom.xml'
-    mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
+    mvn("-P nexus-dev versions:set -DgenerateBackupPoms=false -DnewVersion=" +
             "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
     slackSend channel: this.slackChannel,
             color: "good",
