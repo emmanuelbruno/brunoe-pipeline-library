@@ -48,14 +48,16 @@ def mvn(params) {
                     '-v /var/run/docker.sock:/var/run/docker.sock ' +
                     '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
                     '-v /home/jenkins/.docker:/home/user/.docker ') {
-        def mavenSettingsSecurityFile = "/home/user/.m2/settings-security.xml"
-        def mavenSettingsFile = "/home/user/.m2/settings.xml"
 
         configFileProvider(
-                [configFile(fileId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY',
-                        targetLocation: "${mavenSettingsSecurityFile}"),
-                 configFile(fileId: 'settings.xml', variable: 'MAVEN_SETTINGS',
-                         targetLocation: "${mavenSettingsFile}")]) {
+                [configFile(fileId: 'settings-security.xml',
+                        replaceTokens: true,
+                        targetLocation: '/home/user/.m2/settings-security.xml',
+                        variable: 'MAVEN_SETTINGS_SECURITY'),
+                 configFile(fileId: 'settings.xml',
+                         replaceTokens: true,
+                         targetLocation: '/home/user/.m2/settings.xml',
+                         variable: 'MAVEN_SETTINGS')]) {
             sh "mvn --settings ${MAVEN_SETTINGS} " +
                     "-Duser.home=/home/user " +
                     "-B " +
