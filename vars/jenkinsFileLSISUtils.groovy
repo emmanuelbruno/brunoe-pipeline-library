@@ -49,15 +49,10 @@ def mvn(params) {
                     '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
                     '-v /home/jenkins/.docker:/home/user/.docker ') {
 
-        configFileProvider(
-                [configFile(fileId: 'settings-security.xml',
-                        replaceTokens: true,
-                        targetLocation: '/home/user/settings-security.xml',
-                        variable: 'MAVEN_SETTINGS_SECURITY'),
-                 configFile(fileId: 'settings.xml',
-                         replaceTokens: true,
-                         targetLocation: '/home/user/settings.xml',
-                         variable: 'MAVEN_SETTINGS')]) {
+        withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
+                         [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
+        ]) {
+            sh "cp ${MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
             sh "mvn --settings ${MAVEN_SETTINGS} " +
                     "-Duser.home=/home/user " +
                     "-B " +
