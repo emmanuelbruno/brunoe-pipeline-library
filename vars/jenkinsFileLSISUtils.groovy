@@ -52,11 +52,11 @@ def mvn(params) {
         configFileProvider(
                 [configFile(fileId: 'settings-security.xml',
                         replaceTokens: true,
-                        targetLocation: '/home/user/.m2/settings-security.xml',
+                        targetLocation: '/home/user/settings-security.xml',
                         variable: 'MAVEN_SETTINGS_SECURITY'),
                  configFile(fileId: 'settings.xml',
                          replaceTokens: true,
-                         targetLocation: '/home/user/.m2/settings.xml',
+                         targetLocation: '/home/user/settings.xml',
                          variable: 'MAVEN_SETTINGS')]) {
             sh "mvn --settings ${MAVEN_SETTINGS} " +
                     "-Duser.home=/home/user " +
