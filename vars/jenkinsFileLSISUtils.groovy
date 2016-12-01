@@ -153,9 +153,10 @@ def defaultMavenFullPipeLine() {
             mvnDeploy("-P stage-staging")
             mvnDeploy("-P stage-production")
 
-            jenkinsFileLSISUtils.gitTag()
+            gitTag()
+
         } catch (error) {
-            slackSend channel: jenkinsFileLSISUtils.slackChannel,
+            slackSend channel: slackChannel,
                     color: "danger",
                     message: "Build Error. <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_NUMBER}>) : ${error}"
             throw error
