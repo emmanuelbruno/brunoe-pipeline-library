@@ -118,7 +118,7 @@ def mvnQuality() {
 def gitTag() {
     stage('Git Tag') {
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                          credentialsId   : 'JenkinslsisGithub',
+                          credentialsId   : 'jenkinslsisgithub',
                           usernameVariable: 'GIT_USERNAME',
                           passwordVariable: 'GIT_PASSWORD']]) {
             sh """
