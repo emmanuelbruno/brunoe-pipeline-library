@@ -111,7 +111,7 @@ def mvnQuality() {
         mvn("-P stage-devel sonar:sonar")
         slackSend channel: slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Quality measured."
     }
 }
 
