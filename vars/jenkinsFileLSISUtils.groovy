@@ -137,21 +137,21 @@ def defaultMavenFullPipeLine() {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
             //This file should be protected (signed ?)
 
-            jenkinsFileLSISUtils.slackChannel = "ci"
-            jenkinsFileLSISUtils.mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
+            slackChannel = "ci"
+            mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
 
             //checkout and set version with buildnumber
-            jenkinsFileLSISUtils.init()
+            init()
 
             //clean build package without tests
-            jenkinsFileLSISUtils.mvnBuild()
+            mvnBuild()
             //run all tests
-            jenkinsFileLSISUtils.mvnTest()
-            jenkinsFileLSISUtils.mvnDeploy("-P stage-devel")
+            mvnTest()
+            mvnDeploy("-P stage-devel")
             //check quality
-            jenkinsFileLSISUtils.mvnQuality()
-            jenkinsFileLSISUtils.mvnDeploy("-P stage-staging")
-            jenkinsFileLSISUtils.mvnDeploy("-P stage-production")
+            mvnQuality()
+            mvnDeploy("-P stage-staging")
+            mvnDeploy("-P stage-production")
 
             jenkinsFileLSISUtils.gitTag()
         } catch (error) {
