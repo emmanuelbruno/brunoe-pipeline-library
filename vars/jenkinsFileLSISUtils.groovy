@@ -54,12 +54,12 @@ def mvn(params) {
     }
 }
 
-def mvnDeploy(params) {
+def mvnDeploy(params, destination) {
     stage('Deploy') {
         mvn(params + " deploy")
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] pushed."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] deploy to "+destination+"."
     }
 }
 
@@ -147,11 +147,11 @@ def defaultMavenFullPipeLine() {
             mvnBuild()
             //run all tests
             mvnTest()
-            mvnDeploy("-P stage-devel")
+            mvnDeploy("-P stage-devel","devel")
             //check quality
             mvnQuality()
-            mvnDeploy("-P stage-staging")
-            mvnDeploy("-P stage-production")
+            mvnDeploy("-P stage-staging","staging")
+            mvnDeploy("-P stage-production","production")
 
             gitTag()
 
