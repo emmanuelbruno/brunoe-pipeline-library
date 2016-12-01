@@ -39,15 +39,17 @@ def mvn(params) {
         withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
                          [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
         ]) {
-            sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
-            sh "mvn --settings ${MAVEN_SETTINGS} " +
-                    "-Duser.home=/home/user " +
-                    "-B " +
-                    "-Ddocker.host=tcp://172.18.0.1:2375 " +
-                    "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
-                    params
+            ansiColor('gnome-terminal') {
+                sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
+                sh "mvn --settings ${MAVEN_SETTINGS} " +
+                        "-Duser.home=/home/user " +
+                        "-B " +
+                        "-Ddocker.host=tcp://172.18.0.1:2375 " +
+                        "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
+                        params
+            }
         }
     }
 }
@@ -62,23 +64,25 @@ def mvnDeploy(params) {
 }
 
 def init() {
-    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                      credentialsId   : 'login.utln',
-                      usernameVariable: 'UTLN_USERNAME',
-                      passwordVariable: 'UTLN_PASSWORD']]) {
-        this.UTLN_USERNAME = env.UTLN_USERNAME
-        this.UTLN_PASSWORD = env.UTLN_PASSWORD
-    }
+    stage('Init') {
+        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                          credentialsId   : 'login.utln',
+                          usernameVariable: 'UTLN_USERNAME',
+                          passwordVariable: 'UTLN_PASSWORD']]) {
+            this.UTLN_USERNAME = env.UTLN_USERNAME
+            this.UTLN_PASSWORD = env.UTLN_PASSWORD
+        }
 
-    checkout scm
-    this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
-    this.pom = readMavenPom file: 'pom.xml'
-    mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
-            "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
-    this.pom = readMavenPom file: 'pom.xml'
-    slackSend channel: this.slackChannel,
-            color: "good",
-            message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
+        checkout scm
+        this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
+        this.pom = readMavenPom file: 'pom.xml'
+        mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
+                "${pom.version.replaceAll('-SNAPSHOT', '-' + env.BUILD_NUMBER)}")
+        this.pom = readMavenPom file: 'pom.xml'
+        slackSend channel: this.slackChannel,
+                color: "good",
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
+    }
 }
 
 
@@ -111,9 +115,8 @@ def mvnQuality() {
     }
 }
 
-
 def gitTag() {
-    stage('Tag to Github') {
+    stage('Git Tag') {
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'JenkinslsisGithub',
                           usernameVariable: 'GIT_USERNAME',
