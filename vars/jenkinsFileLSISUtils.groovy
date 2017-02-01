@@ -147,11 +147,11 @@ def defaultMavenFullPipeLine() {
             mvnBuild()
             //run all tests
             mvnTest()
-            mvnDeploy("-P stage-devel","devel")
             //check quality
             mvnQuality()
-            mvnDeploy("-P stage-staging","staging")
-            mvnDeploy("-P stage-production","production")
+            mvnDeploy("-P stage-devel","devel")
+            //mvnDeploy("-P stage-staging","staging")
+            //mvnDeploy("-P stage-production","production")
 
             gitTag()
 
