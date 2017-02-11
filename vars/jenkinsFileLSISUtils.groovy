@@ -44,6 +44,7 @@ def mvn(params) {
                     '-e DOCKER_HOST=tcp://172.18.0.1:2375 ' +
                     '-v /var/run/docker.sock:/var/run/docker.sock ' +
                     '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
+                    '-v /home/jenkins/.sonar:/home/user/.sonar ' +
                     '-v /home/jenkins/.docker:/home/user/.docker ') {
 
         withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
