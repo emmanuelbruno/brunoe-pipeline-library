@@ -1,8 +1,8 @@
 #!groovy
 def tokens = "${env.JOB_NAME}".tokenize('/')
-@Field def ORG = tokens[tokens.size() - 3]
-@Field def REPO = tokens[tokens.size() - 2]
-@Field def BRANCH = tokens[tokens.size() - 1]
+ORG = tokens[tokens.size() - 3]
+REPO = tokens[tokens.size() - 2]
+BRANCH = tokens[tokens.size() - 1]
 
 def slack_channel
 
