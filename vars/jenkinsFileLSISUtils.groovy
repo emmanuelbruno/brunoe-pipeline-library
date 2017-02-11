@@ -136,7 +136,7 @@ def gitTag() {
             sh """
        git add .
        git commit -m 'Tag Jenkins Build'
-       git tag jenkins-${BRANCH}-${pom.artifactId}-${pom.version}
+       git tag jenkins-${pom.artifactId}-${BRANCH}-${pom.version}
        git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${gitRemote}  --tags
        """
         }
