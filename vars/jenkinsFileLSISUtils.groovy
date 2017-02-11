@@ -56,7 +56,6 @@ def mvn(params) {
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
                         "-Duser.home=/home/user " +
                         "-B " +
-                        "-DbuildNumber=${env.BUILD_NUMBER} " +
                         "-Ddocker.host=unix:///var/run/docker.sock " +
                         "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                         "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
@@ -90,12 +89,14 @@ def init() {
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
         this.pom = readMavenPom file: 'pom.xml'
 
-        //remove -SNAPSHOT
-        def version = pom.version.replaceAll('-SNAPSHOT', '')
-
+        /*def version = pom.version.replaceAll('-SNAPSHOT', '')
         mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
-                version + '-' + env.BUILD_NUMBER)
+                version + '-' + env.BUILD_NUMBER) */
+
+        mvn("jgitflow:build-number -DbuildNumber=${env.BUILD_NUMBER}")
+
         this.pom = readMavenPom file: 'pom.xml'
+
         slackSend channel: this.slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
