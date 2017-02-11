@@ -169,7 +169,7 @@ def defaultMavenFullPipeLine() {
             if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
                 mvnDeploy("-P stage-production", "production")
             else {
-                gitTag()
+                //gitTag()
                 if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
                     mvnDeploy("-P stage-devel", "devel")
                 else if (BRANCH.startsWith("release-"))
