@@ -1,8 +1,8 @@
 #!groovy
 def tokens = "${env.JOB_NAME}".tokenize('/')
-def org = tokens[tokens.size() - 3]
-def repo = tokens[tokens.size() - 2]
-def branch = tokens[tokens.size() - 1]
+@Field def ORG = tokens[tokens.size() - 3]
+@Field def REPO = tokens[tokens.size() - 2]
+@Field def BRANCH = tokens[tokens.size() - 1]
 
 def slack_channel
 
@@ -150,11 +150,11 @@ def defaultMavenFullPipeLine() {
             //check quality
             mvnQuality()
 
-            if (branch.equals("development") || branch.startwith("feature-"))
+            if (BRANCH.equals("development") || BRANCH.startwith("feature-"))
                 mvnDeploy("-P stage-devel", "devel")
-            else if (branch.equals("release"))
+            else if (BRANCH.equals("release"))
                 mvnDeploy("-P stage-staging", "staging")
-            else if (branch.equals("master") || branch.startwith("hotfix-"))
+            else if (BRANCH.equals("master") || BRANCH.startwith("hotfix-"))
                 mvnDeploy("-P stage-production", "production")
 
             gitTag()
