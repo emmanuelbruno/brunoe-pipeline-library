@@ -56,6 +56,7 @@ def mvn(params) {
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
                         "-Duser.home=/home/user " +
                         "-B " +
+                        "-DbuildNumber=${env.BUILD_NUMBER} " +
                         "-Ddocker.host=unix:///var/run/docker.sock " +
                         "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                         "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
