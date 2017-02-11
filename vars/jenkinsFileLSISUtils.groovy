@@ -162,11 +162,11 @@ def defaultMavenFullPipeLine() {
             //check quality
             mvnQuality()
 
-            if (BRANCH.equals("development") || BRANCH.startswith("feature-"))
+            if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
                 mvnDeploy("-P stage-devel", "devel")
-            else if (BRANCH.startswith("release-"))
+            else if (BRANCH.startsWith("release-"))
                 mvnDeploy("-P stage-staging", "staging")
-            else if (BRANCH.equals("master") || BRANCH.startswith("hotfix-"))
+            else if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
                 mvnDeploy("-P stage-production", "production")
 
             gitTag()
