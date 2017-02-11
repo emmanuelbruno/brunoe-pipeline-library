@@ -41,7 +41,8 @@ def mvn(params) {
             .inside(
             "-e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    '-e DOCKER_HOST=tcp://172.18.0.1:2375 ' +
+                    "-e no_proxy=.univ-tln.fr,127.0.0.1, 172.18.0.1" +
+                    '-e DOCKER_HOST=unix:///var/run/docker.sock ' +
                     '-v /var/run/docker.sock:/var/run/docker.sock ' +
                     '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
                     '-v /home/jenkins/.sonar:/home/user/.sonar ' +
@@ -55,7 +56,7 @@ def mvn(params) {
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
                         "-Duser.home=/home/user " +
                         "-B " +
-                        "-Ddocker.host=tcp://172.18.0.1:2375 " +
+                        "-Ddocker.host=unix:///var/run/docker.sock " +
                         "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                         "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                         "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
