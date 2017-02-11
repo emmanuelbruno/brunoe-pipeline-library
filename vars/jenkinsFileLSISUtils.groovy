@@ -59,7 +59,7 @@ def mvnDeploy(params, destination) {
         mvn(params + " deploy")
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Deployed to "+destination+"."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Deployed to " + destination + "."
     }
 }
 
@@ -149,12 +149,15 @@ def defaultMavenFullPipeLine() {
             mvnTest()
             //check quality
             mvnQuality()
-            mvnDeploy("-P stage-devel","devel")
-            //mvnDeploy("-P stage-staging","staging")
-            //mvnDeploy("-P stage-production","production")
+
+            if (branch.equals("development") || branch.startwith("feature-"))
+                mvnDeploy("-P stage-devel", "devel")
+            else if (branch.equals("release"))
+                mvnDeploy("-P stage-staging", "staging")
+            else if (branch.equals("master") || branch.startwith("hotfix-"))
+                mvnDeploy("-P stage-production", "production")
 
             gitTag()
-
         } catch (error) {
             slackSend channel: slackChannel,
                     color: "danger",
