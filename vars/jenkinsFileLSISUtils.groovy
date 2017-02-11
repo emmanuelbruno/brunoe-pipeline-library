@@ -88,8 +88,12 @@ def init() {
         checkout scm
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
         this.pom = readMavenPom file: 'pom.xml'
+
+        //remove -SNAPSHOT
+        def version = pom.version.replaceAll('-SNAPSHOT', '')
+
         mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
-                "${pom.version.replaceAll('-SNAPSHOT', '.' + env.BUILD_NUMBER)}")
+                version + '-' + env.BUILD_NUMBER)
         this.pom = readMavenPom file: 'pom.xml'
         slackSend channel: this.slackChannel,
                 color: "good",
@@ -136,7 +140,7 @@ def gitTag() {
             sh """
        git add .
        git commit -m 'Tag Jenkins Build'
-       git tag jenkins-${pom.artifactId}-${BRANCH}-${pom.version}
+       git tag jenkins-${pom.artifactId}-${pom.version}
        git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${gitRemote}  --tags
        """
         }
@@ -162,14 +166,16 @@ def defaultMavenFullPipeLine() {
             //check quality
             mvnQuality()
 
-            if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
-                mvnDeploy("-P stage-devel", "devel")
-            else if (BRANCH.startsWith("release-"))
-                mvnDeploy("-P stage-staging", "staging")
-            else if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
+            if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
                 mvnDeploy("-P stage-production", "production")
+            else {
+                gitTag()
+                if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
+                    mvnDeploy("-P stage-devel", "devel")
+                else if (BRANCH.startsWith("release-"))
+                    mvnDeploy("-P stage-staging", "staging")
+            }
 
-            gitTag()
         } catch (error) {
             slackSend channel: slackChannel,
                     color: "danger",
