@@ -166,7 +166,7 @@ def defaultMavenFullPipeLine() {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
             //This file should be protected (signed ?)
 
-            slackChannel = "ci"
+            setSlackChannel("ci")
             //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
             setMavenDockerImage('hub-docker.lsis.univ-tln.fr:443/brunoe/maven')
 
