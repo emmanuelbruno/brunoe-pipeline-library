@@ -164,7 +164,8 @@ def defaultMavenFullPipeLine() {
             //This file should be protected (signed ?)
 
             slackChannel = "ci"
-            mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
+            //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
+            mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven'
 
             //checkout and set version with buildnumber
             init()
