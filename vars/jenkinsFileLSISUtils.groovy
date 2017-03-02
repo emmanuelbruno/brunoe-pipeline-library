@@ -14,7 +14,7 @@ String REPO = tokens[tokens.size() - 2]
 String BRANCH = tokens[tokens.size() - 1]
 
 @Field
-String slack_channel
+String slackChannel
 
 @Field
 String gitRemote
