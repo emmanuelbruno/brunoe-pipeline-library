@@ -63,7 +63,7 @@ def mvn(params) {
             ansiColor('gnome-terminal') {
 //                sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
-                        "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} "
+                        "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
                         "-Duser.home=/home/user " +
                         "-B " +
                         "-Ddocker.host=unix:///var/run/docker.sock " +
