@@ -61,8 +61,9 @@ def mvn(params) {
                          [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
         ]) {
             ansiColor('gnome-terminal') {
-                sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
+//                sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
+                        "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} "
                         "-Duser.home=/home/user " +
                         "-B " +
                         "-Ddocker.host=unix:///var/run/docker.sock " +
