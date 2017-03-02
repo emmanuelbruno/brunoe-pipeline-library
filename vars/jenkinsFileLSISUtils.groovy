@@ -81,7 +81,7 @@ def mvnDeploy(params, destination) {
         mvn(params + " deploy")
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Deployed to " + destination + "."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Deployed to " + destination + "."
     }
 }
 
@@ -99,7 +99,7 @@ def init() {
         checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch']], submoduleCfg: []])
 
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
-        this.pom = readMavenPom file: 'pom.xml'
+        //this.pom = readMavenPom file: 'pom.xml'
 
         /*def version = pom.version.replaceAll('-SNAPSHOT', '')
         mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
@@ -110,7 +110,7 @@ def init() {
 
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Build starting"
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
     }
 }
 
@@ -120,7 +120,7 @@ def mvnBuild() {
         mvn("-P stage-devel -Dmaven.test.skip=true clean package")
         slackSend channel: slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] builded."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] builded."
     }
 }
 
@@ -131,7 +131,7 @@ def mvnTest() {
         )
         slackSend channel: slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Tested."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Tested."
     }
 }
 
@@ -140,7 +140,7 @@ def mvnQuality() {
         mvn("-P stage-devel sonar:sonar")
         slackSend channel: slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Quality measured."
+                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Quality measured."
     }
 }
 
