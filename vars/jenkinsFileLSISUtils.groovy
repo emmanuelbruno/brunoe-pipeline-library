@@ -2,7 +2,7 @@
 import groovy.transform.Field
 
 @Field
-def tokens = "${env.JOB_NAME}".tokenize('/')
+tokens = "${env.JOB_NAME}".tokenize('/')
 
 @Field
 String ORG = tokens[tokens.size() - 3]
@@ -165,7 +165,7 @@ def defaultMavenFullPipeLine() {
 
             slackChannel = "ci"
             //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
-            mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven'
+            setMavenDockerImage('hub-docker.lsis.univ-tln.fr:443/brunoe/maven')
 
             //checkout and set version with buildnumber
             init()
