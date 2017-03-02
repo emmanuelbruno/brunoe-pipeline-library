@@ -33,7 +33,7 @@ def setPom(pom) {
 }
 
 def setGitRemote(gitRemote) {
-    this.getRemore = gitRemote
+    this.getRemote = gitRemote
 }
 
 def mvn(params) {
@@ -94,7 +94,6 @@ def init() {
                 version + '-' + env.BUILD_NUMBER) */
 
         mvn("jgitflow:build-number -DbuildNumber=${env.BUILD_NUMBER}")
-
         this.pom = readMavenPom file: 'pom.xml'
 
         slackSend channel: this.slackChannel,
