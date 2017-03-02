@@ -103,7 +103,7 @@ def init() {
         mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
                 version + '-' + env.BUILD_NUMBER) */
 
-        mvn("jgitflow:build-number -DbuildNumber=${env.BUILD_NUMBER}")
+        mvn("-DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
         this.pom = readMavenPom file: 'pom.xml'
 
         slackSend channel: this.slackChannel,
