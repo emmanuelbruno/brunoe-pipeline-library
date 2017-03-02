@@ -19,6 +19,12 @@ String slack_channel
 @Field
 String gitRemote
 
+@Field
+String pom
+
+@Field
+String mavenDockerImage
+
 def setSlackChannel(slackChannel) {
     this.slackChannel = slackChannel
 }
