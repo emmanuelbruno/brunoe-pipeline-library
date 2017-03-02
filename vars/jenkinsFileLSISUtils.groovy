@@ -16,6 +16,9 @@ String BRANCH = tokens[tokens.size() - 1]
 @Field
 String slack_channel
 
+@Field
+String gitRemote
+
 def setSlackChannel(slackChannel) {
     this.slackChannel = slackChannel
 }
