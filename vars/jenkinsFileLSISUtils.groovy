@@ -81,7 +81,7 @@ def mvnDeploy(params, destination) {
         mvn(params + " deploy")
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Deployed to " + destination + "."
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Deployed to " + destination + "."
     }
 }
 
@@ -110,7 +110,7 @@ def init() {
 
         slackSend channel: this.slackChannel,
                 color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
+                message: "[<${env.BUILD_URL}|${this.pom.groupId}-${this.pom.artifactId}:${this.pom.version}>] Build starting"
     }
 }
 
