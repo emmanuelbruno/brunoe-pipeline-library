@@ -95,7 +95,9 @@ def init() {
             this.UTLN_PASSWORD = env.UTLN_PASSWORD
         }
 
-        checkout scm
+//        checkout scm
+        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch']], submoduleCfg: []])
+
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
         this.pom = readMavenPom file: 'pom.xml'
 
