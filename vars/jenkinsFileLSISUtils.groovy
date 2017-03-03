@@ -25,6 +25,9 @@ String pom
 @Field
 String mavenDockerImage
 
+@Field
+Strinf finalMessage
+
 def setSlackChannel(slackChannel) {
     this.slackChannel = slackChannel
 }
@@ -43,6 +46,14 @@ def setPom(pom) {
 
 def setGitRemote(gitRemote) {
     this.getRemote = gitRemote
+}
+
+def setFinalMessage(finalMessage) {
+    this.finalMessage = finalMessage
+}
+
+def appendFinalMessage(message) {
+    this.finalMessage += finalMessage
 }
 
 def mvn(params) {
@@ -78,12 +89,9 @@ def mvn(params) {
 def mvnDeploy(params, destination) {
     stage('Deploy') {
         mvn(params + " deploy")
-        slackSend channel: this.slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Deployed to " + destination + "."
+        appendFinalMessage(", deployed to \" + destination + \".\"")
     }
 }
-
 
 def init() {
     stage('Init') {
@@ -95,11 +103,11 @@ def init() {
             this.UTLN_PASSWORD = env.UTLN_PASSWORD
         }
 
-//        checkout scm
+//      checkout scm
         checkout([
-                $class: 'GitSCM',
-                branches: scm.branches,
-                extensions: scm.extensions + [[$class: 'CleanCheckout'] + [$class: 'LocalBranch']],
+                $class           : 'GitSCM',
+                branches         : scm.branches,
+                extensions       : scm.extensions + [[$class: 'CleanCheckout'] + [$class: 'LocalBranch']],
                 userRemoteConfigs: scm.userRemoteConfigs
         ])
 
@@ -111,9 +119,7 @@ def init() {
         }
 
         pom = readMavenPom file: 'pom.xml'
-        slackSend channel: this.slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
+        appendFinalMessage("<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>")
     }
 }
 
@@ -121,9 +127,7 @@ def init() {
 def mvnBuild() {
     stage('Build') {
         mvn("-P stage-devel -Dmaven.test.skip=true clean package")
-        slackSend channel: slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] builded."
+        appendFinalMessage(" builded")
     }
 }
 
@@ -132,18 +136,14 @@ def mvnTest() {
         mvn("-P stage-devel org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
-        slackSend channel: slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Tested."
+        appendFinalMessage(", tested")
     }
 }
 
 def mvnQuality() {
     stage('Quality') {
         mvn("-P stage-devel sonar:sonar")
-        slackSend channel: slackChannel,
-                color: "good",
-                message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Quality measured."
+        appendFinalMessage(", <https://sonar.lsis.univ-tln.fr/|qualified>")
     }
 }
 
@@ -184,15 +184,19 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             mvnQuality()
 
             //Deploy depending on the branch type
-            if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
+            if (BRANCH.equals("master"))
                 mvnDeploy("-P stage-production", "production")
             else {
                 //gitTag()
                 if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
                     mvnDeploy("-P stage-devel", "devel")
-                else if (BRANCH.startsWith("release-"))
+                else if (BRANCH.startsWith("release-") || BRANCH.startsWith("hotfix-"))
                     mvnDeploy("-P stage-staging", "staging")
             }
+
+            slackSend channel: this.slackChannel,
+                    color: "good",
+                    message: finalMessage
 
         } catch (error) {
             slackSend channel: slackChannel,
@@ -201,6 +205,5 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             throw error
         } finally {
         }
-
     }
 }
