@@ -99,7 +99,7 @@ def init() {
         checkout([
                 $class: 'GitSCM',
                 branches: scm.branches,
-                extensions: scm.extensions + [[$class: 'CleanCheckout']],
+                extensions: scm.extensions + [[$class: 'CleanCheckout'] + [$class: 'LocalBranch']],
                 userRemoteConfigs: scm.userRemoteConfigs
         ])
 
