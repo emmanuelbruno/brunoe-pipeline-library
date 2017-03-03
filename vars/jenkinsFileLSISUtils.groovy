@@ -86,15 +86,9 @@ def mvn(params) {
     }
 }
 
-def mvnDeploy(params, destination) {
-    stage('Deploy') {
-        mvn(params + " deploy")
-        appendFinalMessage(", deployed to \" + destination + \".\"")
-    }
-}
-
 def init() {
     stage('Init') {
+        setFinalMessage("")
         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                           credentialsId   : 'login.utln',
                           usernameVariable: 'UTLN_USERNAME',
@@ -160,6 +154,13 @@ def gitTag() {
        git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@${gitRemote}  --tags
        """
         }
+    }
+}
+
+def mvnDeploy(params, destination) {
+    stage('Deploy') {
+        mvn(params + " deploy")
+        appendFinalMessage(", deployed to " + destination + ".")
     }
 }
 
