@@ -2,7 +2,7 @@
 import groovy.transform.Field
 
 @Field
-tokens = "${env.JOB_NAME}".tokenize('/')
+        tokens = "${env.JOB_NAME}".tokenize('/')
 
 @Field
 String ORG = tokens[tokens.size() - 3]
@@ -61,7 +61,6 @@ def mvn(params) {
                          [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
         ]) {
             ansiColor('gnome-terminal') {
-//                sh "cp ${env.MAVEN_SETTINGS_SECURITY} /home/user/settings-security.xml"
                 sh "mvn --settings ${MAVEN_SETTINGS} " +
                         "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
                         "-Duser.home=/home/user " +
@@ -96,17 +95,14 @@ def init() {
         }
 
         checkout scm
-//        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch']], submoduleCfg: []])
         sh 'git checkout $BRANCH_NAME'
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
-        //this.pom = readMavenPom file: 'pom.xml'
 
-        /*def version = pom.version.replaceAll('-SNAPSHOT', '')
-        mvn("versions:set -DgenerateBackupPoms=false -DnewVersion=" +
-                version + '-' + env.BUILD_NUMBER) */
-
-        mvn("-DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
-        pom = readMavenPom file: 'pom.xml'
+        //Adds an explicit builnumber except for final release and hotfixes
+        if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-")) {
+            mvn("-DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
+            pom = readMavenPom file: 'pom.xml'
+        }
 
         slackSend channel: this.slackChannel,
                 color: "good",
@@ -160,7 +156,7 @@ def gitTag() {
     }
 }
 
-def defaultMavenFullPipeLine() {
+def defaultMavenFullPipeLine(maven_docker_image) {
     node() {
         try {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
@@ -168,7 +164,7 @@ def defaultMavenFullPipeLine() {
 
             setSlackChannel("ci")
             //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
-            setMavenDockerImage('hub-docker.lsis.univ-tln.fr:443/brunoe/maven')
+            setMavenDockerImage(maven_docker_image)
 
             //checkout and set version with buildnumber
             init()
@@ -180,6 +176,7 @@ def defaultMavenFullPipeLine() {
             //check quality
             mvnQuality()
 
+            //Deploy depending on the branch type
             if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))
                 mvnDeploy("-P stage-production", "production")
             else {
