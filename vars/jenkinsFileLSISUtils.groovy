@@ -107,14 +107,14 @@ def init() {
 
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
-        //Adds an explicit builnumber except for final release and hotfixes
+        //Adds an explicit builnumber except for final releases
         if (!BRANCH.equals("master")) {
             buildNumberVersionSuffix = "-build"
             if (BRANCH.equals("development")) buildNumberVersionSuffix  = "-devbuild"
             if (BRANCH.startsWith("release-")) buildNumberVersionSuffix = "-prereleasebuild"
             if (BRANCH.startsWith("hotfix-")) buildNumberVersionSuffix  = "-hotfixbuild"
             if (BRANCH.startsWith("feature-")) buildNumberVersionSuffix = "-featurebuild"
-            mvn("-buildNumberVersionSuffix=" + buildNumberVersionSuffix + " -DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
+            mvn("-DbuildNumberVersionSuffix=" + buildNumberVersionSuffix + " -DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
         }
 
         pom = readMavenPom file: 'pom.xml'
