@@ -26,7 +26,7 @@ String pom
 String mavenDockerImage
 
 @Field
-Strinf finalMessage
+String finalMessage
 
 def setSlackChannel(slackChannel) {
     this.slackChannel = slackChannel
