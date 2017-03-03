@@ -94,8 +94,15 @@ def init() {
             this.UTLN_PASSWORD = env.UTLN_PASSWORD
         }
 
+        checkout([
+                $class: 'GitSCM',
+                branches: scm.branches,
+                extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
+                userRemoteConfigs: scm.userRemoteConfigs
+        ])
+
         checkout scm
-        sh 'git checkout $BRANCH_NAME'
+//        sh 'git checkout $BRANCH_NAME'
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
         //Adds an explicit builnumber except for final release and hotfixes
