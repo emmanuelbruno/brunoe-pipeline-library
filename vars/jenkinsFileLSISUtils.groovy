@@ -184,9 +184,10 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             mvnQuality()
 
             //Deploy depending on the branch type
-            if (BRANCH.equals("master"))
+            if (BRANCH.equals("master")) {
                 mvnDeploy("-P stage-production", "production")
-            else {
+                mvn("site -P github-site")
+            } else {
                 //gitTag()
                 if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
                     mvnDeploy("-P stage-devel", "devel")
