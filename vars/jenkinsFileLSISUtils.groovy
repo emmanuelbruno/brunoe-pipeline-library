@@ -133,9 +133,9 @@ def init() {
         //Adds an explicit builnumber except for final release and hotfixes
         if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-")) {
             mvn("-DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
-            pom = readMavenPom file: 'pom.xml'
         }
 
+        pom = readMavenPom file: 'pom.xml'
         slackSend channel: this.slackChannel,
                 color: "good",
                 message: "[<${env.BUILD_URL}|${pom.groupId}-${pom.artifactId}:${pom.version}>] Build starting"
