@@ -106,7 +106,7 @@ def init() {
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
         //Adds an explicit builnumber except for final release and hotfixes
-        if (BRANCH.equals("master") || BRANCH.startsWith("hotfix-")) {
+        if (!(BRANCH.equals("master") || BRANCH.startsWith("hotfix-"))) {
             mvn("-DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
         }
 
