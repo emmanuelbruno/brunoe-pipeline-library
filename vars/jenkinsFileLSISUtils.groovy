@@ -53,7 +53,7 @@ def setFinalMessage(finalMessage) {
 }
 
 def appendFinalMessage(message) {
-    this.finalMessage += finalMessage
+    this.finalMessage += message
 }
 
 def mvn(params) {
