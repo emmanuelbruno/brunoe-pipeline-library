@@ -125,7 +125,7 @@ def init() {
 
 def mvnBuild(stage) {
     stage('Build') {
-        mvn("-P stage-${stage} -Dmaven.test.skip=true clean package")
+        mvn("-P stage-"+${stage}+" -Dmaven.test.skip=true clean package")
         appendFinalMessage(" builded")
     }
 }
