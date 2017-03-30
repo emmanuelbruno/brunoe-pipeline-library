@@ -145,7 +145,7 @@ def mvnQuality(currentStage) {
         file = readFile "target/sonar/report-task.txt"
         println "0 "+file
         def values = [:]
-        file.eachLine {
+        while( (line=file.readLine()) != null )
             println "1 "+line
             item=line.split('=', 2)
             println "2 "+item
