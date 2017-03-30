@@ -107,12 +107,12 @@ def init() {
 
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
-        //Adds an explicit builnumber except for final releases
+        //Adds an explicit buildnumber except for final releases
         if (!BRANCH.equals("master")) {
             buildNumberVersionSuffix = "-build"
-            if (BRANCH.equals("development")) buildNumberVersionSuffix  = "-devbuild"
+            if (BRANCH.equals("development")) buildNumberVersionSuffix = "-devbuild"
             if (BRANCH.startsWith("release-")) buildNumberVersionSuffix = "-prereleasebuild"
-            if (BRANCH.startsWith("hotfix-")) buildNumberVersionSuffix  = "-hotfixbuild"
+            if (BRANCH.startsWith("hotfix-")) buildNumberVersionSuffix = "-hotfixbuild"
             if (BRANCH.startsWith("feature-")) buildNumberVersionSuffix = "-featurebuild"
             mvn("-DbuildNumberVersionSuffix=" + buildNumberVersionSuffix + " -DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
         }
@@ -123,25 +123,25 @@ def init() {
 }
 
 
-def mvnBuild() {
+def mvnBuild(stage) {
     stage('Build') {
-        mvn("-P stage-devel -Dmaven.test.skip=true clean package")
+        mvn("-P stage-${stage} -Dmaven.test.skip=true clean package")
         appendFinalMessage(" builded")
     }
 }
 
-def mvnTest() {
+def mvnTest(stage) {
     stage('Test') {
-        mvn("-P stage-devel org.jacoco:jacoco-maven-plugin:prepare-agent " +
+        mvn("-P stage-${stage} org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
         appendFinalMessage(", tested")
     }
 }
 
-def mvnQuality() {
+def mvnQuality(stage) {
     stage('Quality') {
-        mvn("-P stage-devel sonar:sonar")
+        mvn("-P stage-${stage} sonar:sonar")
         appendFinalMessage(", <https://sonar.lsis.univ-tln.fr/|qualified>")
     }
 }
@@ -162,10 +162,10 @@ def gitTag() {
     }
 }
 
-def mvnDeploy(params, destination) {
+def mvnDeploy(stage) {
     stage('Deploy') {
-        mvn(params + " deploy")
-        appendFinalMessage(", deployed to " + destination + ".")
+        mvn("-P stage-${stage} deploy")
+        appendFinalMessage(", deployed to " + stage + ".")
     }
 }
 
@@ -179,6 +179,16 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
             setMavenDockerImage(maven_docker_image)
 
+            //Set stage of the build
+            stage = "devel"
+            if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
+                stage = "devel"
+            else if (BRANCH.startsWith("release-") || BRANCH.startsWith("hotfix-"))
+                stage = "staging"
+            else if (BRANCH.equals("master")) {
+                stage = "production"
+            }
+
             //checkout and set version with buildnumber
             init()
 
@@ -190,16 +200,9 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             mvnQuality()
 
             //Deploy depending on the branch type
-            if (BRANCH.equals("master")) {
-                mvnDeploy("-P stage-production", "production")
+            mvnDeploy("", stage)
+            if (stage.equals("production"))
                 mvn("site -P github-site")
-            } else {
-                //gitTag()
-                if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
-                    mvnDeploy("-P stage-devel", "devel")
-                else if (BRANCH.startsWith("release-") || BRANCH.startsWith("hotfix-"))
-                    mvnDeploy("-P stage-staging", "staging")
-            }
 
             slackSend channel: this.slackChannel,
                     color: "good",
