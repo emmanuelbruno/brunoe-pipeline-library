@@ -204,11 +204,11 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             init()
 
             //clean build package without tests
-            mvnBuild()
+            mvnBuild(stage)
             //run all tests
-            mvnTest()
+            mvnTest(stage)
             //check quality
-            mvnQuality()
+            mvnQuality(stage)
 
             //Deploy depending on the branch type
             mvnDeploy("", stage)
