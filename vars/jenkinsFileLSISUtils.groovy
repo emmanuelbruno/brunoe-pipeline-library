@@ -123,25 +123,25 @@ def init() {
 
 }
 
-def mvnBuild(stage) {
+def mvnBuild(currentStage) {
     stage('Build') {
-        mvn("-P stage-"+${stage}+" -Dmaven.test.skip=true clean package")
+        mvn("-P stage-${currentStage} -Dmaven.test.skip=true clean package")
         appendFinalMessage(" builded")
     }
 }
 
-def mvnTest(stage) {
+def mvnTest(currentStage) {
     stage('Test') {
-        mvn("-P stage-${stage} org.jacoco:jacoco-maven-plugin:prepare-agent " +
+        mvn("-P stage-${currentStage} org.jacoco:jacoco-maven-plugin:prepare-agent " +
                 "verify"
         )
         appendFinalMessage(", tested")
     }
 }
 
-def mvnQuality(stage) {
+def mvnQuality(currentStage) {
     stage('Quality') {
-        mvn("-P stage-${stage} sonar:sonar")
+        mvn("-P stage-${currentStage} sonar:sonar")
         File file = readFile "target/sonar/report-task.txt"
         def values = [:]
         file.splitEachLine('=', 2) { item -> values."${item[0]}" = item[1] }
@@ -183,28 +183,28 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             setMavenDockerImage(maven_docker_image)
 
             //Set stage of the build
-            def stage = "devel"
+            currentStage = "devel"
             if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
-                stage = "devel"
+                currentStage = "devel"
             else if (BRANCH.startsWith("release-") || BRANCH.startsWith("hotfix-"))
-                stage = "staging"
+                currentStage = "staging"
             else if (BRANCH.equals("master")) {
-                stage = "production"
+                currentStage = "production"
             }
 
             //checkout and set version with buildnumber
             init()
 
             //clean build package without tests
-            mvnBuild(stage)
+            mvnBuild(currentStage)
             //run all tests
-            mvnTest(stage)
+            mvnTest(currentStage)
             //check quality
-            mvnQuality(stage)
+            mvnQuality(currentStage)
 
             //Deploy depending on the branch type
-            mvnDeploy("", stage)
-            if (stage.equals("production"))
+            mvnDeploy("", currentStage)
+            if (currentStage.equals("production"))
                 mvn("site -P github-site")
 
             slackSend channel: this.slackChannel,
