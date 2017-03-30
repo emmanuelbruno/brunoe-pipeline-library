@@ -143,6 +143,7 @@ def mvnQuality(currentStage) {
     stage('Quality') {
         mvn("-P stage-${currentStage} sonar:sonar")
         file = readFile "target/sonar/report-task.txt"
+        println "0 "+file
         def values = [:]
         for (String line:file) {
             println "1 "+line
