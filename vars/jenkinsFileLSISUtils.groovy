@@ -123,7 +123,6 @@ def init() {
 
 }
 
-
 def mvnBuild(stage) {
     stage('Build') {
         mvn("-P stage-${stage} -Dmaven.test.skip=true clean package")
@@ -143,7 +142,18 @@ def mvnTest(stage) {
 def mvnQuality(stage) {
     stage('Quality') {
         mvn("-P stage-${stage} sonar:sonar")
-        appendFinalMessage(", <https://sonar.lsis.univ-tln.fr/|qualified>")
+        File file = new File("target/sonar/report-task.txt")
+        def line
+        def values = [:]
+        file.withReader { reader ->
+            while ((line = reader.readLine())!=null) {
+                prop=line.split('=',2);
+                values."${prop[0]}" = prop[1]
+            }
+            println "${values['dashboardUrl']}"
+            println "${values['ceTaskUrl']}"
+        }
+        appendFinalMessage(", <${values['dashboardUrl']}|qualified>")
     }
 }
 
