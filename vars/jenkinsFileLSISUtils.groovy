@@ -169,7 +169,7 @@ def gitTag() {
     }
 }
 
-def mvnDeploy(stage) {
+def mvnDeploy(currentStage) {
     stage('Deploy') {
         mvn("-P stage-${currentStage} deploy")
         appendFinalMessage(", deployed to " + currentStage + ".")
