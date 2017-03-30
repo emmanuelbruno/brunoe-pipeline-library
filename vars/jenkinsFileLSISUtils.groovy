@@ -145,7 +145,9 @@ def mvnQuality(currentStage) {
         file = readFile "target/sonar/report-task.txt"
         def values = [:]
         for (String line:file) {
-            item=line.split('=', 2);
+            println "1 "+line
+            item=line.split('=', 2)
+            println "2 "+item
             values."${item[0]}" = item[1]
         }
         appendFinalMessage(", <${values['dashboardUrl']}|qualified>")
