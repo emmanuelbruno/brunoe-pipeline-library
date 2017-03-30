@@ -109,12 +109,12 @@ def init() {
 
         //Adds an explicit buildnumber except
 
-        buildNumberVersionSuffix = "-build"
-        if (BRANCH.equals("master")) buildNumberVersionSuffix = "-releasebuild"
-        else if (BRANCH.equals("development")) buildNumberVersionSuffix = "-devbuild"
-        else if (BRANCH.startsWith("release-")) buildNumberVersionSuffix = "-prereleasebuild"
-        else if (BRANCH.startsWith("hotfix-")) buildNumberVersionSuffix = "-hotfixbuild"
-        else if (BRANCH.startsWith("feature-")) buildNumberVersionSuffix = "-featurebuild"
+        buildNumberVersionSuffix = "-b"
+        if (BRANCH.equals("master")) buildNumberVersionSuffix = "-r"
+        else if (BRANCH.equals("development")) buildNumberVersionSuffix = "-d"
+        else if (BRANCH.startsWith("release-")) buildNumberVersionSuffix = "-pr"
+        else if (BRANCH.startsWith("hotfix-")) buildNumberVersionSuffix = "-h"
+        else if (BRANCH.startsWith("feature-")) buildNumberVersionSuffix = "-f"
         mvn("-DbuildNumberVersionSuffix=" + buildNumberVersionSuffix + " -DbuildNumber=${env.BUILD_NUMBER} jgitflow:build-number")
 
         pom = readMavenPom file: 'pom.xml'
@@ -209,7 +209,7 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             //Deploy depending on the branch type
             mvnDeploy(currentStage)
             if (currentStage.equals("production"))
-                mvn("site -P github-site")
+                mvn("-P github-site site")
 
             slackSend channel: this.slackChannel,
                     color: "good",
