@@ -183,7 +183,7 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             setMavenDockerImage(maven_docker_image)
 
             //Set stage of the build
-            stage = "devel"
+            def stage = "devel"
             if (BRANCH.equals("development") || BRANCH.startsWith("feature-"))
                 stage = "devel"
             else if (BRANCH.startsWith("release-") || BRANCH.startsWith("hotfix-"))
