@@ -143,12 +143,12 @@ def mvnQuality(currentStage) {
     stage('Quality') {
         mvn("-P stage-${currentStage} sonar:sonar")
         file = readFile "target/sonar/report-task.txt"
-        println "0 "+file
+        println "0 " + file
         def values = [:]
-        while( (line=file.readLine()) != null )
-            println "1 "+line
-            item=line.split('=', 2)
-            println "2 "+item
+        while ((line = file.readLine()) != null) {
+            println "1 " + line
+            item = line.split('=', 2)
+            println "2 " + item
             values."${item[0]}" = item[1]
         }
         appendFinalMessage(", <${values['dashboardUrl']}|qualified>")
