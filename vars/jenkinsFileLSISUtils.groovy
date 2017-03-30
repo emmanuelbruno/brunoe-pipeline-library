@@ -207,7 +207,7 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             mvnQuality(currentStage)
 
             //Deploy depending on the branch type
-            mvnDeploy("", currentStage)
+            mvnDeploy(currentStage)
             if (currentStage.equals("production"))
                 mvn("site -P github-site")
 
