@@ -209,7 +209,7 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             //Deploy depending on the branch type
             mvnDeploy(currentStage)
             if (currentStage.equals("production"))
-                mvn("-P github-site site")
+                mvn("-U -P github-site site")
 
             slackSend channel: this.slackChannel,
                     color: "good",
