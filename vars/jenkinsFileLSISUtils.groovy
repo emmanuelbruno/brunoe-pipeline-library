@@ -71,19 +71,15 @@ def mvn(params) {
         withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
                          [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
         ]) {
-            ansiColor('gnome-terminal') {
-                sshagent(['ssh.git']) {
-                    sh "mvn --settings ${MAVEN_SETTINGS} " +
-                            "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
-                            "-Duser.home=/home/user " +
-                            "-B " +
-                            "-Ddocker.host=unix:///var/run/docker.sock " +
-                            "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                            "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                            "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
-                            params
-                }
-            }
+            sh "mvn --settings ${MAVEN_SETTINGS} " +
+                    "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
+                    "-Duser.home=/home/user " +
+                    "-B " +
+                    "-Ddocker.host=unix:///var/run/docker.sock " +
+                    "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                    "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                    "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
+                    params
         }
     }
 }
