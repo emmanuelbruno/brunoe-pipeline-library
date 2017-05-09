@@ -175,7 +175,7 @@ def mvnDeploy(currentStage) {
 }
 
 def defaultMavenFullPipeLine(maven_docker_image) {
-    //node() {
+    node() {
         try {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
             //This file should be protected (signed ?)
@@ -220,5 +220,5 @@ def defaultMavenFullPipeLine(maven_docker_image) {
             throw error
         } finally {
         }
-    //}
+    }
 }
