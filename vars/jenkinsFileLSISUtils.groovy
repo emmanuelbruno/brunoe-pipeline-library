@@ -57,7 +57,7 @@ def appendFinalMessage(message) {
 }
 
 def mvn(params) {
-    docker.image(this.mavenDockerImage)
+    docker.image(this.mavenDockerImage).withServer('unix:///var/run/docker.sock')
             .inside(
             "--privileged=true -e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
