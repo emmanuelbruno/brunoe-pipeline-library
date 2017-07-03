@@ -57,29 +57,31 @@ def appendFinalMessage(message) {
 }
 
 def mvn(params) {
-    docker.withServer("unix:///var/run/docker.sock").image(this.mavenDockerImage)
-            .inside(
-            "-e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-e no_proxy=.univ-tln.fr,127.0.0.1,172.18.0.1 " +
-                    '-e DOCKER_HOST=unix:///var/run/docker.sock ' +
-                    '-v /var/run/docker.sock:/var/run/docker.sock ' +
-                    '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
-                    '-v /home/jenkins/.sonar:/home/user/.sonar ' +
-                    '-v /home/jenkins/.docker:/home/user/.docker ') {
+    docker.withServer("unix:///var/run/docker.sock") {
+        docker.image(this.mavenDockerImage)
+                .inside(
+                "-e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-e no_proxy=.univ-tln.fr,127.0.0.1,172.18.0.1 " +
+                        '-e DOCKER_HOST=unix:///var/run/docker.sock ' +
+                        '-v /var/run/docker.sock:/var/run/docker.sock ' +
+                        '-v /home/jenkins/.m2/repository:/home/user/.m2/repository ' +
+                        '-v /home/jenkins/.sonar:/home/user/.sonar ' +
+                        '-v /home/jenkins/.docker:/home/user/.docker ') {
 
-        withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
-                         [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
-        ]) {
-            sh "mvn --settings ${MAVEN_SETTINGS} " +
-                    "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
-                    "-Duser.home=/home/user " +
-                    "-B " +
-                    "-Ddocker.host=unix:///var/run/docker.sock " +
-                    "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
-                    "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
-                    params
+            withCredentials([[$class: 'FileBinding', credentialsId: 'settings-security.xml', variable: 'MAVEN_SETTINGS_SECURITY'],
+                             [$class: 'FileBinding', credentialsId: 'settings.xml', variable: 'MAVEN_SETTINGS']
+            ]) {
+                sh "mvn --settings ${MAVEN_SETTINGS} " +
+                        "-Dsettings.security=${MAVEN_SETTINGS_SECURITY} " +
+                        "-Duser.home=/home/user " +
+                        "-B " +
+                        "-Ddocker.host=unix:///var/run/docker.sock " +
+                        "-Ddocker.buildArg.http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-Ddocker.buildArg.https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
+                        "-Ddocker.buildArg.no_proxy=hub-docker.lsis.univ-tln.fr,.univ-tln.fr " +
+                        params
+            }
         }
     }
 }
@@ -94,7 +96,6 @@ def init() {
             this.UTLN_USERNAME = env.UTLN_USERNAME
             this.UTLN_PASSWORD = env.UTLN_PASSWORD
         }
-
 
         //WS Cleanup
         step([$class: 'WsCleanup'])
@@ -179,7 +180,7 @@ def mvnDeploy(currentStage) {
     }
 }
 
-def defaultMavenFullPipeLine(maven_docker_image='hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT') {
+def defaultMavenFullPipeLine(maven_docker_image = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT') {
     node() {
         try {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
