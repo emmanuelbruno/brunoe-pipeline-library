@@ -56,8 +56,9 @@ def appendFinalMessage(message) {
     this.finalMessage += message
 }
 
+
 def mvn(params) {
-    withDockerServer('unix:///var/run/docker.sock').image(this.mavenDockerImage)
+    withDockerServer("unix:///var/run/docker.sock").image(this.mavenDockerImage)
             .inside(
             "-e http_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
                     "-e https_proxy=http://${UTLN_USERNAME}:${UTLN_PASSWORD}@proxy.univ-tln.fr:3128 " +
