@@ -95,13 +95,18 @@ def init() {
             this.UTLN_PASSWORD = env.UTLN_PASSWORD
         }
 
-//      checkout scm
-        checkout([
+
+        //WS Cleanup
+        step([$class: 'WsCleanup'])
+        //Checkout
+        checkout scm
+
+        /*checkout([
                 $class           : 'GitSCM',
                 branches         : scm.branches,
                 extensions       : scm.extensions + [[$class: 'CleanCheckout'] + [$class: 'LocalBranch']],
                 userRemoteConfigs: scm.userRemoteConfigs
-        ])
+        ])*/
 
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
@@ -174,14 +179,13 @@ def mvnDeploy(currentStage) {
     }
 }
 
-def defaultMavenFullPipeLine(maven_docker_image) {
+def defaultMavenFullPipeLine(maven_docker_image='hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT') {
     node() {
         try {
             //In jenkins add settings.xml, settings-security.xml, login.utln (utln password)
             //This file should be protected (signed ?)
 
             setSlackChannel("ci")
-            //mavenDockerImage = 'hub-docker.lsis.univ-tln.fr:443/brunoe/maven:3-3.9-SNAPSHOT'
             setMavenDockerImage(maven_docker_image)
 
             //Set stage of the build
