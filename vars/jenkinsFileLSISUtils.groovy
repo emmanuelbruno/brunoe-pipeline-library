@@ -100,14 +100,14 @@ def init() {
         //WS Cleanup
         step([$class: 'WsCleanup'])
         //Checkout
-        checkout scm
+        //checkout scm
 
-        /*checkout([
+        checkout([
                 $class           : 'GitSCM',
                 branches         : scm.branches,
                 extensions       : scm.extensions + [[$class: 'CleanCheckout'] + [$class: 'LocalBranch']],
                 userRemoteConfigs: scm.userRemoteConfigs
-        ])*/
+        ])
 
         this.gitRemote = sh(returnStdout: true, script: 'git remote get-url origin|cut -c9-').trim()
 
